@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Project 1</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: hsl(30, 10%, 98%);
+        max-width: 60%;
+        margin: auto;
+        padding: 20px 0;
+      }
+
+      section {
+        margin-bottom: 5px;
+      }
+
+      .img-container {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin: 0 auto;
+        max-width: 100%;
+      }
+
+      .img-container img {
+        max-height: 256px; /* adjust height as needed */
+        height: auto;
+        width: auto;
+      }
+
+      .img-container div {
+        background-color: hsl(210, 0%, 94%);
+        border: 1px solid black;
+        border-radius: 5px;
+        padding: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Project 1: Colorizing the Prokudin-Gorskii Collection</h1>
+    <div>
+      <h3>Overview</h3>
+      <div>
+        <p>
+          This project involved colorizing photographs from the digitized
+          Prokudin-Gorskii collection of glass plate images. The collection
+          includes various photos each separated into three grayscale color
+          channels (R/G/B). The goal was to develop an algorithm to combine
+          these grayscale channels into a single color photograph.
+        </p>
+      </div>
+    </div>
+    <section>
+      <h3>Approach</h3>
+      <div>
+        <p>
+          The initial naive algorithm calculates a displacement vector for each
+          of the red and green color channels of the image with the goal of
+          aligning each of them with the blue color channel. For each of the red
+          and green channels, an exhaustive sliding window over displacement
+          vectors in the range (-w, -w) to (w, w) is calculated, where w is some
+          user-specified window size. For each displacement vector, the
+          red/green channel is translated according to the vector, both the
+          red/green and blue channels are cropped to remove any border
+          artifacts, and a loss function is calculated over the two channels. I
+          tried L1, L2, and NCC loss functions and ultimately decided on L2 for
+          my final algorithm (which I found to work best). Additionally, an
+          activation/feature map may be calculated over both the red/green and
+          blue channels before the loss is calculated. In my final algorithm, I
+          use an edge-detection filter described below in the "Bells and
+          Whistles" section. Of all displacement vectors in the window, the one
+          that produces the lowest loss value is used for the channel. The final
+          image is constructed by combining the blue, translated red, and
+          translated green channels (all of which are uncropped).
+          <br />
+          <br />
+          A modified version of the algorithm is used to support larger images.
+          This version implements an "image pyramid" that recursively downscales
+          the image, and performs a sliding window search over each scale of the
+          image (starting with the most downscaled version). The displacement
+          vector of the next lower-scaled image is used as a center/starting
+          point for the sliding window of the current image scale. The size of
+          the sliding window also scales dynamically with the image scale so
+          that more downscaled images search over a larger sliding window while
+          higher-resolution images only search over a smaller sliding window of
+          pixels.
+        </p>
+      </div>
+    </section>
+    <section>
+      <h3>Results</h3>
+      <p>
+        Reconstructed images and their corresponding red/green offsets (x, y)
+        from the example set.
+      </p>
+      <div class="img-container">
+        <div>
+          <img src="media/cathedral.jpg" alt="cathedral" />
+          <p>
+            cathedral <br />
+            Red: (2, 5) <br />
+            Green: (3, 12)
+          </p>
+        </div>
+        <div>
+          <img src="media/church.jpg" alt="church" />
+          <p>
+            church <br />
+            Red: (4, 24) <br />
+            Green: (-4, 58)
+          </p>
+        </div>
+        <div>
+          <img src="media/emir.jpg" alt="emir" />
+          <p>
+            emir <br />
+            Red: (24, 49) <br />
+            Green: (40, 107)
+          </p>
+        </div>
+        <div>
+          <img src="media/harvesters.jpg" alt="harvesters" />
+          <p>
+            harvesters <br />
+            Red: (18, 60) <br />
+            Green: (11, 125)
+          </p>
+        </div>
+        <div>
+          <img src="media/icon.jpg" alt="icon" />
+          <p>
+            icon <br />
+            Red: (16, 39) <br />
+            Green: (23, 90)
+          </p>
+        </div>
+        <div>
+          <img src="media/italil.jpg" alt="italil" />
+          <p>
+            italil <br />
+            Red: (22, 38) <br />
+            Green: (34, 74)
+          </p>
+        </div>
+        <div>
+          <img src="media/lastochikino.jpg" alt="lastochikino" />
+          <p>
+            lastochikino <br />
+            Red: (-1, -3) <br />
+            Green: (-8, 75)
+          </p>
+        </div>
+        <div>
+          <img src="media/lugano.jpg" alt="lugano" />
+          <p>
+            lugano <br />
+            Red: (-17, 41) <br />
+            Green: (-29, 91)
+          </p>
+        </div>
+        <div>
+          <img src="media/melons.jpg" alt="melons" />
+          <p>
+            melons <br />
+            Red: (10, 80) <br />
+            Green: (12, 166)
+          </p>
+        </div>
+        <div>
+          <img src="media/monastery.jpg" alt="monastery" />
+          <p>
+            monastery <br />
+            Red: (2, -3) <br />
+            Green: (2, 3)
+          </p>
+        </div>
+        <div>
+          <img src="media/self_portrait.jpg" alt="self portrait" />
+          <p>
+            self portrait <br />
+            Red: (29, 77) <br />
+            Green: (37, 174)
+          </p>
+        </div>
+        <div>
+          <img src="media/siren.jpg" alt="siren" />
+          <p>
+            siren <br />
+            Red: (-7, 49) <br />
+            Green: (-24, 97)
+          </p>
+        </div>
+        <div>
+          <img src="media/three_generations.jpg" alt="three generations" />
+          <p>
+            three generations <br />
+            Red: (17, 58) <br />
+            Green: (8, 111)
+          </p>
+        </div>
+        <div>
+          <img src="media/tobolsk.jpg" alt="tobolsk" />
+          <p>
+            tobolsk <br />
+            Red: (3, 3) <br />
+            Green: (3, 6)
+          </p>
+        </div>
+      </div>
+    </section>
+    <section>
+      <h3>Other Images</h3>
+      <p>
+        Additional reconstructed images of my choosing and their corresponding
+        red/green offsets (x, y).
+      </p>
+      <div class="img-container">
+        <div>
+          <img src="media/dock.jpg" alt="dock" />
+          <p>
+            dock <br />
+            Red: (-7, 15) <br />
+            Green: (-16, 83)
+          </p>
+        </div>
+        <div>
+          <img src="media/forest.jpg" alt="forest" />
+          <p>
+            forest <br />
+            Red: (-7, 15) <br />
+            Green: (-16, 83)
+          </p>
+        </div>
+        <div>
+          <img src="media/mill.jpg" alt="mill" />
+          <p>
+            mill <br />
+            Red: (15, 51) <br />
+            Green: (19, 105)
+          </p>
+        </div>
+        <div>
+          <img src="media/pillars.jpg" alt="pillars" />
+          <p>
+            pillars <br />
+            Red: (26, 14) <br />
+            Green: (49, 86)
+          </p>
+        </div>
+        <div>
+          <img src="media/rafters.jpg" alt="rafters" />
+          <p>
+            rafters <br />
+            Red: (13, 59) <br />
+            Green: (24, 127)
+          </p>
+        </div>
+      </div>
+    </section>
+    <section>
+      <h3>Bells and Whistles</h3>
+      <div>
+        <h4>Edge Detection:</h4>
+        <p>
+          I modified the algorithm to use an edge detection activation map over
+          each color channel before calculating the l2 loss between the
+          activation maps. The edge detector feature first applies a Gaussian
+          blur to the color channel and then applies the Canny edge detector
+          (both use the OpenCV implementaiton). It significantly improves
+          results for some images where color intensity varies significantly
+          between channels.
+        </p>
+      </div>
+      <div class="img-container">
+        <div>
+          <img src="media/emir_before.jpg" />
+          <p>
+            emir (without edge detection) <br />
+            Red: (25, 52) <br />
+            Green: (41, -145)
+          </p>
+        </div>
+        <div>
+          <img src="media/emir.jpg" />
+          <p>
+            emir (with edge detection)<br />
+            Red: (24, 49) <br />
+            Green: (40, 107)
+          </p>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>
