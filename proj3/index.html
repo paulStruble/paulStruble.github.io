@@ -14,12 +14,15 @@
         display: flex;
         gap: 10px; /* space between images */
         flex-wrap: wrap;
+        justify-content: center;
       }
 
       .img-container img {
         max-height: 300px;
         height: auto;
         width: auto;
+        border-radius: 2%;
+        border: 1px solid black;
       }
 
       /* Matrix display styles */
@@ -77,21 +80,26 @@
     </style>
   </head>
   <body>
-    <h1>Project 3: Image Warping and Mosaicing (Part A)</h1>
+    <h1>Project 3: Image Warping and Mosaicing</h1>
     <p>
       Project 3 involved using homography transformations to warp images to
       different perspectives and create blended mosaics/panoramas of multiple
       images taken from different perspectives.
     </p>
+    <h2>Part A: Image Warping and Mosaicing</h2>
+    <p>
+      Part A focused on implementing the algorithms required to warp images into
+      alignment given a set of correspondences to create mosaics/panoramas.
+    </p>
     <div>
       <h3>A.1: Shoot the Pictures</h3>
       <p>
-        Part 1 involved taking the pictures to be used for the project. Multiple
-        pictures were taken of the same scene but from different perspectives.
-        All images of the same scene were simply rotated around the center of
-        projection (i.e. the camera lens), and an overlap between the contents
-        of each (adjacent) image was necessary to allow identification of
-        correspondences.
+        Part A.1 involved taking the pictures to be used for the project.
+        Multiple pictures were taken of the same scene but from different
+        perspectives. All images of the same scene were simply rotated around
+        the center of projection (i.e. the camera lens), and an overlap between
+        the contents of each (adjacent) image was necessary to allow
+        identification of correspondences.
       </p>
       <div class="img-container">
         <div>
@@ -119,7 +127,7 @@
     <div>
       <h3>A.2: Recover Homographies</h3>
       <p>
-        Part 2 involved implementing the algorithm to actually calculate the
+        Part A.2 involved implementing the algorithm to actually calculate the
         homography transformation matrix H from 2 sets of corresponding points
         between two images. Correspondences were identified manually using a
         tool that allows the user to click on points that correspond to one
@@ -136,9 +144,9 @@
         squares linear regression.
       </p>
       <p>
-        Below is a pair of images with their correspondences labeled, followed by 
-        the final H homography matrix and the matrix representation of
-        the system of linear equations solved (with least squares) to obtain it 
+        Below is a pair of images with their correspondences labeled, followed
+        by the final H homography matrix and the matrix representation of the
+        system of linear equations solved (with least squares) to obtain it
         (from the correspondences).
       </p>
 
@@ -151,98 +159,14 @@
         </div>
       </div>
 
-      <div>
-        <!-- H matrix -->
-        <h4>H</h4>
-        <div class="matrix">
-          <div class="inner">[[ 1.46483242e+00     -7.40634003e-02     -1.87404334e+03]
-[ 3.74904589e-01      .22683906e+00        -9.60201866e+02]
-[ 1.15387861e-04      1.28968888e-05       1.00000000e+00]]</div>
-        </div>
-      </div> 
-
-      <div>
-        <div class="section" style="flex: 1 1 520px; min-width: 320px;">
-          <!-- A h = y -->
-          <h4 style="margin-top:16px;">A&nbsp;h&nbsp;=&nbsp;y</h4>
-          <div class="eq">
-            <div>
-              <div class="label">A</div>
-              <div class="matrix"><div class="inner">[[     1680      2682         1         0            0               0         572880         -914562]
- [     1939      2497         1         0            0               0       -1237082        -1593086] 
- [     2372      2299         1         0            0               0       -2744404        -2659943]
- [     2656      2670         1         0            0               0       -3827296        -3847470]
- [     3954      2843         1         0            0               0      -10292262        -7400329]
- [     3670      3548         1         0            0               0       -8646520        -8359088]
- [     3979      4129         1         0            0               0      -10357337        -10747787]
- [     3213      4080         1         0            0               0       -6101487        -7747920]
- [     2137      3746         1         0            0               0       -1784395        -3127910]
- [     1927      3214         1         0            0               0       -1133076        -1889832]
- [     3151      3214         1         0            0               0       -5983749        -6103386]
- [        0         0               0         1680      2682         1       -4299120        -6863238]
- [        0         0               0         1939      2497         1       -4601247        -5925381]
- [        0         0               0         2372      2299         1       -5218400        -5057800]
- [        0         0               0         2656      2670         1       -6926848        -6963360]
- [        0         0               0         3954      2843         1      -11193774        -8048533]
- [        0         0               0         3670      3548         1      -12657830        -12237052]
- [        0         0               0         3979      4129         1      -15888147        -16487097]
- [        0         0               0         3213      4080         1      -12749184        -16189440]
- [        0         0               0         2137      3746         1       -7926133        -13893914]
- [        0         0               0         1927      3214         1       -6050780        -10091960]
- [        0         0               0         3151      3214         1       -9931952        -10130528]]</div></div>
-            </div>
-
-            <div class="op">×</div>
-
-            <div>
-              <div class="label">h</div>
-              <div class="matrix"><div class="inner">[[ 1.46483242e+00]
- [-7.40634003e-02]
- [-1.87404334e+03]
- [ 3.74904589e-01]
- [ 1.22683906e+00]
- [-9.60201866e+02]
- [ 1.15387861e-04]
- [-1.28968888e-05]]</div></div>
-            </div>
-
-            <div class="op">=</div>
-
-            <div>
-              <div class="label">y</div>
-              <div class="matrix"><div class="inner">[[ 341]
- [ 638]
- [1157]
- [1441]
- [2603]
- [2356]
- [2603]
- [1899]
- [ 835]
- [ 588]
- [1899]
- [2559]
- [2373]
- [2200]
- [2608]
- [2831]
- [3449]
- [3993]
- [3968]
- [3709]
- [3140]
- [3152]]</div></div>
-            </div>
-          </div>
-        </div>
-      </div> <!-- /img-container -->
+      <!-- REPLACE -->
     </div>
 
     <div>
       <h3>A.3: Warp the Images</h3>
       <p>
-        Part 3 involved implementing the actual warping of the images. This was
-        done using inverse warping where each pixel coordinate in the output
+        Part A.3 involved implementing the actual warping of the images. This
+        was done using inverse warping where each pixel coordinate in the output
         image was mapped to a pixel coordinate in the input image using the
         inverse of H. To interpolate pixel values (i.e. to map to a discrete
         pixel coordinate in the input image), two algorithms were implemented:
@@ -282,7 +206,7 @@
     <div>
       <h3>A.4: Blend the Images into a Mosaic</h3>
       <p>
-        Part 4 involved using parts 2 and 3 to warp multiple images into
+        Part A.4 involved using parts A.2 and A.3 to warp multiple images into
         alignment to create a mosaic/panorama effect. The images were also
         blended to hide edge artifacts. A distance transform is used to generate
         the masks used to blend the images more smoothly. A single canvas shape
@@ -313,6 +237,162 @@
           <img src="media/chem1.JPG" />
           <img src="media/chem2.JPG" />
           <img src="media/chem3.JPG" />
+        </div>
+      </div>
+    </div>
+
+    <h2>Part B: Feature Matching for Autostitching</h2>
+    <p>
+      Part B focused on implementing algorithms to automatically align images by
+      automatically detecting corresponding features between images. It
+      implemented the techniques described in "Multi-Image Matching using
+      Multi-Scale Oriented Patches" by Brown et al.
+    </p>
+    <div>
+      <h3>B.1: Harris Corner Detection</h3>
+      <p>
+        Part B.1 involved implementing the Adaptive Non-Maximal Suppression
+        (ANMS) algorithm to the Harris Corner Detection algorithm. Harris corner
+        detection automatically detects potential interest points in an image.
+        ANMS then extracts a subset of only n points. ANMS is designed to
+        balance the significance/prominence of the corner measurement for each
+        selected point with uniformity of distribution over space. In other
+        words, ANMS tries to select points that are significant without
+        selecting tight clusters of points.
+      </p>
+
+      <p>
+        Below is an example of an input image, the same image with all initial
+        (before ANMS) Harris corners marked, and the image with only the top 100
+        Harris corners marked, as selected by ANMS. Note that 100 was a
+        user-defined parameter provided to ANMS.
+      </p>
+      <div class="img-container">
+        <div>
+          <img src="media/harris_in.png" />
+          <img src="media/harris_all.png" />
+          <img src="media/harris_100.png" />
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h3>B.2: Feature Descriptor Extraction</h3>
+      <p>
+        Part B.2 involved extracting feature descriptors for a set of interest
+        points in an image (e.g. those identified in part B.1). The goal is to
+        have a set of features that describes the local neighborhood around a
+        point in the image. The process of extracting a feature from a point
+        involves: blurring the input image (to act as a low-pass filter),
+        sampling a local neighborhood around the interest point (40x40 in our
+        implementation), downsampling (40x40 -> 8x8 in our implementation), and
+        normalizing mean and standard deviation to 0 and 1 (i.e. bias/gain
+        normalization).
+      </p>
+
+      <p>
+        Below are all 100 extracted feature descriptors (at different points in
+        the extraction process) that correspond to the 100 points identified by
+        ANMS in part B.1.
+      </p>
+      <div class="img-container">
+        <div>
+          <img src="media/patches_40.png" />
+          <img src="media/patches_40_blur.png" />
+          <img src="media/patches_8.png" />
+          <img src="media/patches_norm.png" />
+        </div>
+      </div>
+
+      <p>
+        Below is an example of a single extracted feature. Left is the 40x40
+        patch from the source image, the 40x40 patch from the blurred image, and
+        the final 8x8 normalized feature descriptor patch.
+      </p>
+      <div class="img-container">
+        <div>
+          <img src="media/patch_ex_40.png" />
+          <img src="media/patch_ex_40_blur.png" />
+          <img src="media/patch_ex_final.png" />
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h3>B.3: Feature Matching</h3>
+      <p>
+        Part B.3 involved matching corresponding features between two images.
+        The goal is to generate a set of correspondences between two images
+        based on the feature descriptors of interest points in each image. Each
+        point in the left image is mapped to the first and second nearest
+        neighbors in the right image in feature space. The 1NN is assumed to be
+        the correspoinding point, and each mapping is scored by the ratio of
+        1NN/2NN. The correspondences are then thresholded on the 1NN/2NN ratio
+        to eliminate likely bad candidates.
+      </p>
+
+      <p>
+        Below are three examples of correspondences identified by the feature
+        matching algorithm. A static threshold of 0.2 is shown on the left, and
+        the right shows identified correspondences at different thresholds. As
+        the threshold increases, the proportion of outliers (i.e. "incorrect
+        correspondences") typically increases.
+      </p>
+      <div class="img-container">
+        <div>
+          <img src="media/match_vlsb.png" />
+          <img src="media/match_vlsb.gif" />
+        </div>
+      </div>
+      <div class="img-container">
+        <div>
+          <img src="media/match_chem.png" />
+          <img src="media/match_chem.gif" />
+        </div>
+      </div>
+      <div class="img-container">
+        <div>
+          <img src="media/match_camp.png" />
+          <img src="media/match_camp.gif" />
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h3>B.4: RANSAC for Robust Homography</h3>
+      <p>
+        Part B.4 involved implementing RANSAC to eliminate outlier
+        correspondences from feature matching (part B.3). RANSAC identifies the
+        largest set of inliers over multiple homographies calculated from random
+        subsamples of correspondences. A final homography is then calculated
+        from the largest set of inliers as the final mapping between the two
+        images. This process can then be used to generate mosaics/panoramas in
+        the same fashion as Part A.
+      </p>
+
+      <p>
+        Each of the images on the left below is a panorama generated by manually
+        identifying correspondences (Part A), and each of the images on the
+        right is a panorama automatically generated using the techniques from
+        Part B. Both approaches use the same blending techinuqe described in
+        Part A.4.
+      </p>
+      <div class="img-container">
+        <div>
+          <img src="media/vlsb_pano_manual.png" />
+          <img src="media/vlsb_pano_auto.png" />
+        </div>
+      </div>
+      <div class="img-container">
+        <div>
+          <img src="media/chem_pano_manual.png" />
+          <img src="media/chem_pano_auto.png" />
+        </div>
+      </div>
+      <div class="img-container">
+        <div>
+          <img src="media/camp_pano_manual.png" />
+          <img src="media/camp_pano_auto.png" />
         </div>
       </div>
     </div>

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Project 3</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        max-width: 84%;
+        margin: auto;
+      }
+
+      .img-container {
+        display: flex;
+        gap: 10px; /* space between images */
+        flex-wrap: wrap;
+      }
+
+      .img-container img {
+        max-height: 300px;
+        height: auto;
+        width: auto;
+      }
+
+      /* Matrix display styles */
+      .section {
+        margin-bottom: 24px;
+      }
+      .matrix {
+        display: inline-block;
+        position: relative;
+        padding: 10px 14px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+        max-width: 100%;
+        overflow: auto;
+        white-space: pre; /* preserve spacing/line breaks */
+      }
+      .matrix::before,
+      .matrix::after {
+        content: "";
+        position: absolute;
+        top: 6px;
+        bottom: 6px;
+        width: 6px;
+        border: 2px solid #333;
+        border-top: 0;
+        border-bottom: 0;
+        border-radius: 4px;
+      }
+      .matrix::before {
+        left: 6px;
+      }
+      .matrix::after {
+        right: 6px;
+      }
+      .matrix > .inner {
+        padding: 0 12px;
+      } /* inset inside "brackets" */
+
+      .eq {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        flex-wrap: wrap; /* stack on narrow screens */
+      }
+      .op {
+        font-size: 22px;
+        font-weight: 700;
+        padding-top: 10px;
+      }
+      .label {
+        font-weight: 600;
+        margin: 0 0 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Project 3: Image Warping and Mosaicing (Part A)</h1>
+    <p>
+      Project 3 involved using homography transformations to warp images to
+      different perspectives and create blended mosaics/panoramas of multiple
+      images taken from different perspectives.
+    </p>
+    <div>
+      <h3>A.1: Shoot the Pictures</h3>
+      <p>
+        Part 1 involved taking the pictures to be used for the project. Multiple
+        pictures were taken of the same scene but from different perspectives.
+        All images of the same scene were simply rotated around the center of
+        projection (i.e. the camera lens), and an overlap between the contents
+        of each (adjacent) image was necessary to allow identification of
+        correspondences.
+      </p>
+      <div class="img-container">
+        <div>
+          <img src="media/vlsb_wide2.JPG" />
+          <img src="media/vlsb_wide3.JPG" />
+          <img src="media/vlsb_wide4.JPG" />
+        </div>
+      </div>
+      <div class="img-container">
+        <div>
+          <img src="media/camp1.JPG" />
+          <img src="media/camp2.JPG" />
+          <img src="media/camp3.JPG" />
+        </div>
+      </div>
+      <div class="img-container">
+        <div>
+          <img src="media/chem1.JPG" />
+          <img src="media/chem2.JPG" />
+          <img src="media/chem3.JPG" />
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h3>A.2: Recover Homographies</h3>
+      <p>
+        Part 2 involved implementing the algorithm to actually calculate the
+        homography transformation matrix H from 2 sets of corresponding points
+        between two images. Correspondences were identified manually using a
+        tool that allows the user to click on points that correspond to one
+        another in two images. With a list of at least 4 non-degenerate
+        correspondences, there is sufficient information to calculate the
+        homography matrix by solving a system of n linear equations in the
+        matrix form Ah=y where n is the number of correspondences, A is an n*8
+        matrix containing correspondence data, h is the 8*1 flattened homography
+        matrix (with the 9th "scale" degree of freedom fixed at 1), and y is an
+        n*1 matrix containing correspondence data. Supplying only 4
+        correspondences means the system is very sensitive to minor changes in
+        input, so to allow for more than 4 correspondences to be used (i.e. an
+        overdetermined system), we solve the system of equations using least
+        squares linear regression.
+      </p>
+      <p>
+        Below is a pair of images with their correspondences labeled, followed by 
+        the final H homography matrix and the matrix representation of
+        the system of linear equations solved (with least squares) to obtain it 
+        (from the correspondences).
+      </p>
+
+      <div class="img-container">
+        <div>
+          <img src="media/marked1.png" />
+        </div>
+        <div>
+          <img src="media/marked2.png" />
+        </div>
+      </div>
+
+      <div>
+        <!-- H matrix -->
+        <h4>H</h4>
+        <div class="matrix">
+          <div class="inner">[[ 1.46483242e+00     -7.40634003e-02     -1.87404334e+03]
+[ 3.74904589e-01      .22683906e+00        -9.60201866e+02]
+[ 1.15387861e-04      1.28968888e-05       1.00000000e+00]]</div>
+        </div>
+      </div> 
+
+      <div>
+        <div class="section" style="flex: 1 1 520px; min-width: 320px;">
+          <!-- A h = y -->
+          <h4 style="margin-top:16px;">A&nbsp;h&nbsp;=&nbsp;y</h4>
+          <div class="eq">
+            <div>
+              <div class="label">A</div>
+              <div class="matrix"><div class="inner">[[     1680      2682         1         0            0               0         572880         -914562]
+ [     1939      2497         1         0            0               0       -1237082        -1593086] 
+ [     2372      2299         1         0            0               0       -2744404        -2659943]
+ [     2656      2670         1         0            0               0       -3827296        -3847470]
+ [     3954      2843         1         0            0               0      -10292262        -7400329]
+ [     3670      3548         1         0            0               0       -8646520        -8359088]
+ [     3979      4129         1         0            0               0      -10357337        -10747787]
+ [     3213      4080         1         0            0               0       -6101487        -7747920]
+ [     2137      3746         1         0            0               0       -1784395        -3127910]
+ [     1927      3214         1         0            0               0       -1133076        -1889832]
+ [     3151      3214         1         0            0               0       -5983749        -6103386]
+ [        0         0               0         1680      2682         1       -4299120        -6863238]
+ [        0         0               0         1939      2497         1       -4601247        -5925381]
+ [        0         0               0         2372      2299         1       -5218400        -5057800]
+ [        0         0               0         2656      2670         1       -6926848        -6963360]
+ [        0         0               0         3954      2843         1      -11193774        -8048533]
+ [        0         0               0         3670      3548         1      -12657830        -12237052]
+ [        0         0               0         3979      4129         1      -15888147        -16487097]
+ [        0         0               0         3213      4080         1      -12749184        -16189440]
+ [        0         0               0         2137      3746         1       -7926133        -13893914]
+ [        0         0               0         1927      3214         1       -6050780        -10091960]
+ [        0         0               0         3151      3214         1       -9931952        -10130528]]</div></div>
+            </div>
+
+            <div class="op">×</div>
+
+            <div>
+              <div class="label">h</div>
+              <div class="matrix"><div class="inner">[[ 1.46483242e+00]
+ [-7.40634003e-02]
+ [-1.87404334e+03]
+ [ 3.74904589e-01]
+ [ 1.22683906e+00]
+ [-9.60201866e+02]
+ [ 1.15387861e-04]
+ [-1.28968888e-05]]</div></div>
+            </div>
+
+            <div class="op">=</div>
+
+            <div>
+              <div class="label">y</div>
+              <div class="matrix"><div class="inner">[[ 341]
+ [ 638]
+ [1157]
+ [1441]
+ [2603]
+ [2356]
+ [2603]
+ [1899]
+ [ 835]
+ [ 588]
+ [1899]
+ [2559]
+ [2373]
+ [2200]
+ [2608]
+ [2831]
+ [3449]
+ [3993]
+ [3968]
+ [3709]
+ [3140]
+ [3152]]</div></div>
+            </div>
+          </div>
+        </div>
+      </div> <!-- /img-container -->
+    </div>
+
+    <div>
+      <h3>A.3: Warp the Images</h3>
+      <p>
+        Part 3 involved implementing the actual warping of the images. This was
+        done using inverse warping where each pixel coordinate in the output
+        image was mapped to a pixel coordinate in the input image using the
+        inverse of H. To interpolate pixel values (i.e. to map to a discrete
+        pixel coordinate in the input image), two algorithms were implemented:
+        nearest neighbor and bilinear. Nearest neighbor simply rounds to the
+        nearest pixel whereas bilinear calculates a local linear approximation
+        of the the output pixel value from the nearest 4 input pixel values.
+      </p>
+      <p>
+        Below are 2 images that were taken at an angle and rectified using
+        inverse warping with both nearest neighbor interpolation and bilinear
+        interpolation. Both interpolation algorithms are shown for comparison.
+      </p>
+      <div class="img-container">
+        <div>
+          <img src="media/notebook_in.png" style="max-height: 450px" />
+          <!-- <img src="media/notebook_nn.png" style="max-height: 450px;" />
+          <img src="media/notebook_bilin.png" style="max-height: 450px;" /> -->
+          <img src="media/notebook_nn_crop.png" style="max-height: 450px" />
+          <img src="media/notebook_bilin_crop.png" style="max-height: 450px" />
+        </div>
+      </div>
+
+      <div class="img-container">
+        <div>
+          <img src="media/blacklight_in.png" style="max-height: 400px" />
+          <!-- <img src="media/blacklight_nn.png" style="max-height: 400px;" />
+          <img src="media/blacklight_bilin.png" style="max-height: 400px;" /> -->
+          <img src="media/blacklight_nn_crop.png" style="max-height: 400px" />
+          <img
+            src="media/blacklight_bilin_crop.png"
+            style="max-height: 400px"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h3>A.4: Blend the Images into a Mosaic</h3>
+      <p>
+        Part 4 involved using parts 2 and 3 to warp multiple images into
+        alignment to create a mosaic/panorama effect. The images were also
+        blended to hide edge artifacts. A distance transform is used to generate
+        the masks used to blend the images more smoothly. A single canvas shape
+        is generated from each image's dimensions and H matrices before the
+        images are transformed to preserve the translations and scaling in the
+        final panorama.
+      </p>
+      <p>Below are 3 examples of images combined with the panorama effect.</p>
+      <div class="img-container">
+        <div>
+          <img src="media/vlsb_wide_pano.png" />
+          <img src="media/vlsb_wide2.JPG" />
+          <img src="media/vlsb_wide3.JPG" />
+          <img src="media/vlsb_wide4.JPG" />
+        </div>
+      </div>
+      <div class="img-container">
+        <div>
+          <img src="media/camp_pano.png" style="max-width: 500px" />
+          <img src="media/camp1.JPG" style="max-width: 300px" />
+          <img src="media/camp2.JPG" style="max-width: 300px" />
+          <img src="media/camp3.JPG" style="max-width: 300px" />
+        </div>
+      </div>
+      <div class="img-container">
+        <div>
+          <img src="media/chem_pano.png" />
+          <img src="media/chem1.JPG" />
+          <img src="media/chem2.JPG" />
+          <img src="media/chem3.JPG" />
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
